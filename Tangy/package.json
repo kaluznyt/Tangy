@@ -1,0 +1,21 @@
+{
+    "name": "tangy",
+    "version": "1.0.0",
+    "description": " ",
+    "author": "",
+    "repository": " ",
+    "license": "ISC",
+    "dependencies": {
+        "bootstrap": "4.0.0",
+        "cpx": "^1.5.0",
+        "gulp": "^4.0.0",
+        "gulp-concat": "^2.6.1",
+        "gulp-uglify": "^3.0.0",
+        "jquery": "1.9.1",
+        "jquery-validation": "^1.17.0",
+        "jquery-validation-unobtrusive": "^3.2.10",
+        "merge-stream": "^1.0.1",
+        "popper.js": "^1.12.9",
+        "rimraf": "^2.6.2"
+    }
+}
