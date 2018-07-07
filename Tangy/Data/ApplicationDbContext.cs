@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Tangy.Models;
 
 namespace Tangy.Data
 {
@@ -11,6 +12,31 @@ namespace Tangy.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+
+
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            foreach (var entityType in builder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    var attr = property.PropertyInfo.GetCustomAttribute<IndexAttribute>();
+
+                    if (attr != null)
+                    {
+                        var index = entityType.AddIndex(property);
+                        index.IsUnique = attr.IsUnique;
+                        index.SqlServer().IsClustered = attr.IsClustered;
+
+                    }
+                }
+            }
+            base.OnModelCreating(builder);
+        }
+
+        public DbSet<Category> Category { get; set; }
+        public DbSet<SubCategory> SubCategory { get; set; }
     }
 }

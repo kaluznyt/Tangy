@@ -1,0 +1,31 @@
+﻿<CodeSnippet Format="1.0.0">
+    <Header>
+        <Title>method</Title>
+        <Description>Inserts an empty method.</Description>
+        <Author>Steve Fenton</Author>
+        <Shortcut>method</Shortcut>
+        <SnippetTypes>
+            <SnippetType>Expansion</SnippetType>
+        </SnippetTypes>
+    </Header>
+    <Snippet>
+        <Declarations>
+            <Literal>
+                <ID>type</ID>
+                <Default>void</Default>
+            </Literal>
+            <Literal>
+                <ID>name</ID>
+                <Default>methodName</Default>
+            </Literal>
+        </Declarations>
+        <Code Language="CSharp" Kind="any">
+            <![CDATA[
+                    public $type$ $name$()
+                    {
+                        throw new NotImplementedException();
+                    }
+                ]]>
+        </Code>
+    </Snippet>
+</CodeSnippet>

@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Migrations\20180706215006_X.cs" />
+    <Compile Remove="Data\Migrations\20180706215006_X.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
   </ItemGroup>
@@ -13,6 +18,12 @@
   <ItemGroup>
     <Folder Include="wwwroot\lib\jquery\" />
     <Folder Include="wwwroot\vendor\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\SubCategories\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>
