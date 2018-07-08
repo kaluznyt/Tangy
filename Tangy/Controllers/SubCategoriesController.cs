@@ -72,8 +72,12 @@ namespace Tangy.Controllers
 
         private bool ValidateSubCategoryViewModelOnCreate(SubCategoryAndCategoryViewModel model)
         {
-            var doesSubCategoryExist = _dbContext.SubCategory.Any(p => p.Name == model.SubCategory.Name);
-            var doesCategoryExist = _dbContext.SubCategory.Any(p => p.CategoryId == model.SubCategory.CategoryId);
+            var doesSubCategoryExist = _dbContext.SubCategory
+                .Any(p => p.Name == model.SubCategory.Name);
+
+            var doesSubCategoryCategoryCombinationExist = _dbContext.SubCategory
+                .Any(p => p.CategoryId == model.SubCategory.CategoryId 
+                          && p.Name == model.SubCategory.Name);
 
             if (doesSubCategoryExist && model.IsNew)
             {
@@ -87,7 +91,7 @@ namespace Tangy.Controllers
                 return false;
             }
 
-            if (doesSubCategoryExist && doesCategoryExist)
+            if (doesSubCategoryCategoryCombinationExist)
             {
                 StatusMessage = "Error: Category and Sub Category both exist";
                 return false;

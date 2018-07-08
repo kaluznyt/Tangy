@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Tangy.Models.MenuItem>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<br />
+<h2>Menu Item List</h2>
+<br />
+
+<partial name="_CreateButtonPartial" />
+
+<div class="form-border">
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(m => m.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(m => m.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(m => m.CategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(m => m.SubCategoryId)
+            </th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => item.Name)</td>
+                <td>@Html.DisplayFor(m => item.Price)</td>
+                <td>@Html.DisplayFor(m => item.Category.Name)</td>
+                <td>@Html.DisplayFor(m => item.SubCategory.Name)</td>
+                <td><partial name="_TableButtonPartial" model="@item.Id" /></td>
+                <td></td>
+            </tr>
+        }
+    </table>
+</div>

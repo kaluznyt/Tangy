@@ -1,0 +1,120 @@
+﻿@model Tangy.Models.ViewModels.MenuItemViewModel
+@using Tangy.Extensions
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        getSubCategory();
+
+        $("#CategoryId").change(function() {
+            getSubCategory();
+        });
+
+    }, false);
+
+    function getSubCategory() {
+        var url = '@Url.Content("~/")' + "MenuItems/GetSubCategory";
+
+        var categoryDropdown = "#CategoryId";
+        var selectedCategoryId = $(categoryDropdown).val();
+
+        $.getJSON(url,
+            { CategoryID: selectedCategoryId  },
+            function(data) {
+                var items = '';
+                var subCategoryDropdown = $("#SubCategoryId");
+
+                subCategoryDropdown.empty();
+
+                $.each(data,
+                    function(i, subcategory) {
+                        items += "<option value='" + subcategory.value + "'>" + subcategory.text + "</option>";
+                    });
+
+                subCategoryDropdown.html(items);
+            });
+
+    }
+</script>
+
+<br />
+<h2>Create Menu Item</h2>
+<br />
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-border">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.Name"></label>
+            </div>
+            <div class="col-5">
+                <input class="form-control" asp-for="MenuItem.Name" />
+            </div>
+            <span asp-validation-for="MenuItem.Name" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.Description"></label>
+            </div>
+            <div class="col-5">
+                <input class="form-control" asp-for="MenuItem.Description" />
+            </div>
+            <span asp-validation-for="MenuItem.Description" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.Price"></label>
+            </div>
+            <div class="col-5">
+                <input class="form-control" asp-for="MenuItem.Price" />
+            </div>
+            <span asp-validation-for="MenuItem.Price" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.Image"></label>
+            </div>
+            <div class="col-5">
+                <input class="form-control" type="file" name="files" multiple class="form-control">
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.CategoryId"></label>
+            </div>
+            <div class="col-5">
+                <select class="form-control" asp-for="MenuItem.CategoryId" id="CategoryId" asp-items="Model.Category.ToSelectListItem(Model.MenuItem.CategoryId)"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.SubCategoryId"></label>
+            </div>
+            <div class="col-5">
+                <select class="form-control" name="SubCategoryId" id="SubCategoryId" asp-items="@(new SelectList(string.Empty, "Id","Name"))"></select>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-2">
+                <label class="custom-label" asp-for="MenuItem.Spicyness"></label>
+            </div>
+            <div class="col-5">
+                <select class="form-control" asp-for="MenuItem.Spicyness" asp-items="Html.GetEnumSelectList<MenuItem.SpicyLevel>()"></select>
+            </div>
+        </div>
+
+        <br />
+        <div class="form-group">
+            <input type="submit" name="name" value="Create" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-success">Back To List</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

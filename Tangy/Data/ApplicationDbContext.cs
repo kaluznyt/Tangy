@@ -9,6 +9,12 @@ namespace Tangy.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
+        public DbSet<Category> Category { get; set; }
+
+        public DbSet<MenuItem> MenuItem{ get; set; }
+
+        public DbSet<SubCategory> SubCategory { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -36,7 +42,5 @@ namespace Tangy.Data
             base.OnModelCreating(builder);
         }
 
-        public DbSet<Category> Category { get; set; }
-        public DbSet<SubCategory> SubCategory { get; set; }
     }
 }
