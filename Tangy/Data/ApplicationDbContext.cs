@@ -15,6 +15,8 @@ namespace Tangy.Data
 
         public DbSet<SubCategory> SubCategory { get; set; }
 
+        public DbSet<Coupon> Coupon { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
