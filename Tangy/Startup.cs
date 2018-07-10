@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Tangy.Areas.Identity.Data;
 
 namespace Tangy
 {
@@ -38,7 +39,7 @@ namespace Tangy
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<TangyUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

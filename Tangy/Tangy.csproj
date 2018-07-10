@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\lib\jquery\" />
+    <Folder Include="Areas\Identity\Services\" />
     <Folder Include="wwwroot\vendor\" />
   </ItemGroup>
 

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Tangy.Areas.Identity.Data;
 using Tangy.Models;
 
 namespace Tangy.Data
@@ -17,6 +18,8 @@ namespace Tangy.Data
 
         public DbSet<Coupon> Coupon { get; set; }
 
+        public DbSet<TangyUser> Users { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -30,7 +33,7 @@ namespace Tangy.Data
             {
                 foreach (var property in entityType.GetProperties())
                 {
-                    var attr = property.PropertyInfo.GetCustomAttribute<IndexAttribute>();
+                    var attr = property?.PropertyInfo?.GetCustomAttribute<IndexAttribute>();
 
                     if (attr != null)
                     {
