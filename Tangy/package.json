@@ -12,6 +12,7 @@
         "gulp-concat": "^2.6.1",
         "gulp-uglify": "^3.0.0",
         "jquery": "1.9.1",
+        "jquery-ui": "^1.12.1",
         "jquery-validation": "^1.17.0",
         "jquery-validation-unobtrusive": "^3.2.10",
         "merge-stream": "^1.0.1",

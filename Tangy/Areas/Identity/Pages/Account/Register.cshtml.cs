@@ -111,8 +111,7 @@ namespace Tangy.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole(StaticDetails.CustomerEndUser));
                     }
 
-                    await _userManager.AddToRoleAsync(user, StaticDetails.AdminEndUser);
-
+                    await _userManager.AddToRoleAsync(user, StaticDetails.CustomerEndUser);
 
                     _logger.LogInformation("User created a new account with password.");
 
