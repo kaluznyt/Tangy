@@ -40,7 +40,17 @@ namespace Tangy
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<TangyUser>(
+            //services.AddDefaultIdentity<TangyUser>(
+            //        options =>
+            //        {
+            //            options.Lockout.AllowedForNewUsers = true;
+            //            options.Lockout.MaxFailedAccessAttempts = 2;
+            //        })
+            //    .AddRoles<IdentityRole>()
+            //    .AddRoleManager<RoleManager<IdentityRole>>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddIdentity<TangyUser, IdentityRole>(
                     options =>
                     {
                         options.Lockout.AllowedForNewUsers = true;
@@ -48,16 +58,8 @@ namespace Tangy
                     })
                 .AddRoles<IdentityRole>()
                 .AddRoleManager<RoleManager<IdentityRole>>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
-
-            //services.AddIdentity<TangyUser, IdentityRole>(
-            //        options =>
-            //        {
-            //            options.Lockout.AllowedForNewUsers = true;
-            //            options.Lockout.MaxFailedAccessAttempts = 2;
-            //        })
-            //    .AddEntityFrameworkStores<ApplicationDbContext>()
-            //    .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.AddTransient<IEmailSender, EmailSender>();
 
