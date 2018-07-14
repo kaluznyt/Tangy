@@ -1,0 +1,58 @@
+﻿@model Tangy.Areas.Identity.Data.TangyUser
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<br />
+<h2>Edit User</h2>
+<br />
+
+<hr />
+
+<form asp-action="Edit">
+    <div class="form-border">
+        <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group row">
+                <div class="col-2">
+                    <label asp-for="FirstName" class="control-label"></label>
+                </div>
+                <div class="col-4">
+                    <input asp-for="FirstName" class="form-control"/>
+                </div>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-2">
+                    <label asp-for="LastName" class="control-label"></label>
+                </div>
+                <div class="col-4">
+                    <input asp-for="LastName" class="form-control"/>
+                </div>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-2">
+                    <label asp-for="Email" class="control-label"></label>
+                </div>
+                <div class="col-4">
+                    <input asp-for="Email" class="form-control"/>
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-2">
+                    <label asp-for="PhoneNumber" class="control-label"></label>
+                </div>
+                <div class="col-4">
+                    <input asp-for="PhoneNumber" class="form-control"/>
+                </div>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" class="btn btn-primary" value="Update" />
+                <a asp-action="Index" class="btn btn-success">Back to List</a>
+            </div>
+        </div>
+</form>
+

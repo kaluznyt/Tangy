@@ -82,8 +82,6 @@ namespace Tangy
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
-
-
     }
 
     public class EmailSender :IEmailSender

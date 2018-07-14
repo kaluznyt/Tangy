@@ -1,7 +1,45 @@
-﻿
+﻿@model IEnumerable<Tangy.Areas.Identity.Data.TangyUser>
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
+<h2>Manage Users</h2>
 
+<div class="form-border">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(user => user.FirstName )</th>
+                <th>@Html.DisplayNameFor(user => user.LastName )</th>
+                <th>@Html.DisplayNameFor(user => user.Email )</th>
+                <th>@Html.DisplayNameFor(user => user.PhoneNumber )</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => user.FirstName)</td>
+                <td>@Html.DisplayFor(modelItem => user.LastName)</td>
+                <td>@Html.DisplayFor(modelItem => user.Email)</td>
+                <td>@Html.DisplayFor(modelItem => user.PhoneNumber)</td>
+                <td>
+                    <td style="width: 150px;">
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-primary" asp-action="Edit" asp-route-id="@user.Id">
+                                <i class="fas fa-edit"></i>
+                                &nbsp; Edit
+                            </a> 
+                            <a class="btn btn-danger" asp-action="Lock" asp-route-id="@user.Id">
+                                <i class="fas fa-trash-alt"></i>
+                                &nbsp; Lock User
+                            </a>
+                        </div>
+                    </td>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
