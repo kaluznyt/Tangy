@@ -40,30 +40,19 @@ namespace Tangy
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            //services.AddDefaultIdentity<TangyUser>(
-            //        options =>
-            //        {
-            //            options.Lockout.AllowedForNewUsers = true;
-            //            options.Lockout.MaxFailedAccessAttempts = 2;
-            //        })
-            //    .AddRoles<IdentityRole>()
-            //    .AddRoleManager<RoleManager<IdentityRole>>()
-            //    .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.AddIdentity<TangyUser, IdentityRole>(
-                    options =>
-                    {
-                        options.Lockout.AllowedForNewUsers = true;
-                        options.Lockout.MaxFailedAccessAttempts = 2;
-                    })
-                .AddRoles<IdentityRole>()
-                .AddRoleManager<RoleManager<IdentityRole>>()
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddIdentity<TangyUser, IdentityRole>(options => { options.Stores.MaxLengthForKeys = 128; })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultUI()
                 .AddDefaultTokenProviders();
 
-            services.AddTransient<IEmailSender, EmailSender>();
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<IEmailSender, EmailSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
