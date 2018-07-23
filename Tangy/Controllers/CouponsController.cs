@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
 using Tangy.Models;
+using Tangy.Utility;
 
 namespace Tangy.Controllers
 {
+    [Authorize(Roles = StaticDetails.AdminEndUser)]
     public class CouponsController : Controller
     {
         private readonly ApplicationDbContext _db;

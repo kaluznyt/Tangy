@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Tangy.Data;
 using Tangy.Models;
+using Tangy.Utility;
 
 namespace Tangy.Controllers
 {
+    [Authorize(Roles = StaticDetails.AdminEndUser)]
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -40,6 +40,7 @@ namespace Tangy.Controllers
 
             var category = await _context.Category
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -60,14 +61,16 @@ namespace Tangy.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind(nameof(Category.Id), 
-                  nameof(Category.Name), 
+            [Bind(nameof(Category.Id),
+                  nameof(Category.Name),
                   nameof(Category.DisplayOrder))] Category category)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(category);
+
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -96,6 +99,7 @@ namespace Tangy.Controllers
                 try
                 {
                     _context.Update(category);
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -126,8 +130,11 @@ namespace Tangy.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var category = await _context.Category.FindAsync(id);
+
             _context.Category.Remove(category);
+
             await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -135,7 +142,5 @@ namespace Tangy.Controllers
         {
             return _context.Category.Any(e => e.Id == id);
         }
-
-  
     }
 }
