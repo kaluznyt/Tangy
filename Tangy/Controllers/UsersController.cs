@@ -22,7 +22,7 @@ namespace Tangy.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var users = await _db.Users
+            var users = await _db.ApplicationUsers
                 .Where(user => user.Id != this.User.FindFirstValue(ClaimTypes.NameIdentifier))
                 .ToListAsync();
 
@@ -32,7 +32,7 @@ namespace Tangy.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            var user = await _db.Users.SingleOrDefaultAsync(u => u.Id == id.ToString());
+            var user = await _db.ApplicationUsers.SingleOrDefaultAsync(u => u.Id == id.ToString());
 
             if (user == null)
             {
