@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Tangy.Data;
 using Tangy.Models;
@@ -14,8 +15,7 @@ namespace Tangy.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        [BindProperty]
-        public OrderDetailsViewModel OrderDetailsViewModel { get; set; }
+        [BindProperty] public OrderDetailsViewModel OrderDetailsViewModel { get; set; }
 
         public CartController(ApplicationDbContext db)
         {
@@ -45,13 +45,46 @@ namespace Tangy.Controllers
                 {
                     OrderDetailsViewModel.OrderHeader.OrderTotal += (orderItem.MenuItem.Price * orderItem.Count);
 
-                    orderItem.MenuItem.Description = $"{(orderItem.MenuItem.Description.Length > 100 ? orderItem.MenuItem.Description.Substring(0, 99) : orderItem.MenuItem.Description)}...";
+                    orderItem.MenuItem.Description =
+                        $"{(orderItem.MenuItem.Description.Length > 100 ? orderItem.MenuItem.Description.Substring(0, 99) : orderItem.MenuItem.Description)}...";
                 }
             }
 
             OrderDetailsViewModel.OrderHeader.PickupTime = DateTime.Now;
 
             return View(OrderDetailsViewModel);
+        }
+
+        public async Task<IActionResult> IncrementCartItem(int cartId)
+        {
+            var cart = _db.ShoppingCarts.FirstOrDefault(c => c.Id == cartId);
+            cart.Count++;
+
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> DecrementCartItem(int cartId)
+        {
+            var cart = _db.ShoppingCarts.FirstOrDefault(c => c.Id == cartId);
+
+            if (cart.Count == 1)
+            {
+                _db.ShoppingCarts.Remove(cart);
+                await _db.SaveChangesAsync();
+
+                var count = _db.ShoppingCarts.Count(u => u.ApplicationUserId == cart.ApplicationUserId);
+                HttpContext.Session.SetInt32("CartCount", count);
+            }
+            else
+            {
+                cart.Count--;
+
+                await _db.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

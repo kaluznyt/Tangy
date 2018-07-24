@@ -28,16 +28,16 @@
                         <tr style="padding: 50px">
                             <td>
                                 <b>
-                                    @Html.DisplayFor(c=>item.MenuItem.Name)
+                                    @Html.DisplayFor(c => item.MenuItem.Name)
                                 </b>
                                 <br />
-                                @Html.DisplayFor(c=>item.MenuItem.Description)
+                                @Html.DisplayFor(c => item.MenuItem.Description)
                             </td>
                             <td style="width: 70px; text-align: center">
-                                @Html.DisplayFor(c=>item.MenuItem.Price)
+                                @Html.DisplayFor(c => item.MenuItem.Price)
                             </td>
                             <td style="width: 70px; text-align: center">
-                                @Html.DisplayFor(c=>item.Count)
+                                @Html.DisplayFor(c => item.Count)
                             </td>
                             <td>
                                 <button type="submit" class="btn btn-primary" asp-action="IncrementCartItem" asp-route-cartId="@item.Id">
@@ -51,8 +51,52 @@
                     }
                 </table>
             </div>
-
+            <hr />
             <div class="container">
+                <div class="row">
+                    <div class="col-2">
+                        <label class="custom-label">Coupon Code</label>
+                    </div>
+                    <div class="col-2">
+                        <input asp-for="OrderHeader.CouponCode" id="txtCouponCode" class="form-control" />
+                    </div>
+                    <div class="col-2">
+                        <input type="button" value="Apply" id="btnCoupon" class="btn btn-sm btn-success" />
+                        <a asp-action="Index" id="btnRemoveCoupon" style="display: none" class="btn btn-sm btn-success">Remove</a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <label class="custom-label">Order Total</label>
+                    </div>
+                    <div class="col-3">
+                        <input asp-for="OrderHeader.OrderTotal" id="txtOrderTotal" class="form-control" disabled />
+                    </div>
+                    <div class="col-2"></div>
+                    <div class="col-2">
+                        <label class="custom-label">Pick Up Time</label>
+                    </div>
+                    <div class="col-3">
+                        <input asp-for="OrderHeader.PickupTime" id="txtPickupTime" type="text" value="" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2">
+                        <label class="custom-label">Comments</label>
+                    </div>
+                    <div class="col-10">
+                        <textarea asp-for="OrderHeader.Comments" rows="5" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 5px;">
+                    <div class="col-2"></div>
+                    <div class="col-5">
+                        <label class="text-danger" id="lblShopClosed" style="display: none;">Restaurant is closed for the day</label>
+                    </div>
+                    <div class="col-5 text-right">
+                        <button type="submit" id="btnPlaceOrder" onclick="return validateInput()" value="Place Order" class="btn btn-success">Place Order</button>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -65,3 +109,48 @@
 
 </form>
 
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/timepicker@1.11.12/jquery.timepicker.js"></script>
+    <script>
+
+        function validateInput() {
+            var pickupTime = $('#txtPickupTime').val();
+
+            if (pickupTime === "") {
+                alert("Please select pickup time");
+                return false;
+            }
+        }
+
+        $(document).ready(function () {
+            var currentDate = new Date();
+
+            var minTime = "";
+
+            if (currentDate.getHours() < 11) {
+                minTime = "12:00 PM";
+            } else {
+                if (currentDate.getMinutes() < 30) {
+                    minTime = (currentDate.getHours()) + ":30 PM";
+                } else {
+                    minTime = (currentDate.getHours() + 1) + ":00 PM";
+                }
+            }
+
+            if (currentDate.getHours() > 23) {
+                $('#txtPickupTime').prop("disabled", true);
+                $('#btnPlaceOrder').prop("disabled", true);
+                $('#lblShopClosed').show();
+            }
+
+            console.log(minTime);
+
+            $("#txtPickupTime").timepicker({
+                'minTime': minTime,
+                "maxTime": "11:00 PM"
+            });
+
+        });
+    </script>
+
+}
