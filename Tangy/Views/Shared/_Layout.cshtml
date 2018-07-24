@@ -1,4 +1,7 @@
-﻿@using Tangy.Utility
+﻿@using Microsoft.AspNetCore.Http
+@using Tangy.Utility
+
+@inject IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
 <html>
@@ -65,10 +68,11 @@
                     <li style="color: white">
                         <a href="#" class="nav-link">
                             <i class="fas fa-shopping-cart"></i>
-                            &nbsp;(0)
+                            &nbsp;( @(HttpContextAccessor.HttpContext.Session.GetInt32("CartCount") ?? 0)  )
                         </a>
                     </li>
                 }
+                /**/
             </ul>
         </div>
 
