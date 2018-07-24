@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Tangy.Data;
 using Tangy.Models;
 using Tangy.Models.ViewModels;
+using Tangy.Utility;
 
 namespace Tangy.Controllers
 {
@@ -85,6 +86,48 @@ namespace Tangy.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("Index")]
+        public async Task<IActionResult> IndexPost()
+        {
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            OrderDetailsViewModel.OrderItems = _db.ShoppingCarts.Where(c => c.ApplicationUserId == userId).ToList();
+            OrderDetailsViewModel.OrderHeader.OrderDate = DateTime.Now;
+            OrderDetailsViewModel.OrderHeader.UserId = userId;
+            OrderDetailsViewModel.OrderHeader.Status = StaticDetails.OrderStatus.Submitted;
+
+            _db.OrderHeader.Add(OrderDetailsViewModel.OrderHeader);
+
+            await _db.SaveChangesAsync();
+
+            foreach (var cartItem in OrderDetailsViewModel.OrderItems)
+            {
+                cartItem.MenuItem = _db.MenuItem.FirstOrDefault(m => m.Id == cartItem.MenuItemId);
+
+                var orderDetails = new OrderDetails
+                {
+                    MenuItemId = cartItem.MenuItemId,
+                    OrderId = OrderDetailsViewModel.OrderHeader.Id,
+                    Description = cartItem.MenuItem.Description,
+                    Name = cartItem.MenuItem.Name,
+                    Price = cartItem.MenuItem.Price,
+                    Count = cartItem.Count
+                };
+
+                _db.OrderDetails.Add(orderDetails);
+            }
+
+            _db.ShoppingCarts.RemoveRange(OrderDetailsViewModel.OrderItems);
+
+            await _db.SaveChangesAsync();
+            HttpContext.Session.SetInt32("CartCount", 0);
+
+            return RedirectToAction("Index","Home");
+
         }
     }
 }

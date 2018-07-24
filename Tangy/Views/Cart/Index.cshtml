@@ -122,7 +122,7 @@
             }
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             var currentDate = new Date();
 
             var minTime = "";
@@ -149,7 +149,26 @@
                 'minTime': minTime,
                 "maxTime": "11:00 PM"
             });
+        });
 
+        $("#btnCoupon").click(function() {
+            var couponCode = document.getElementById("txtCouponCode").value;
+            var orderTotal = document.getElementById("txtOrderTotal").value;
+
+            $.ajax({
+                url: "/API/CouponAPI?orderTotal=" + orderTotal + "&couponCode=" + couponCode,
+                type: "GET",
+                dataType: "text",
+                success: function(data, textStatus, xhr) {
+                    $("#txtOrderTotal").attr("value", Math.round(data*100)/100);
+                    document.getElementById("txtCouponCode").readonly = true;
+                    document.getElementById("btnCoupon").style.display = "none";
+                    document.getElementById("btnRemoveCoupon").style.display = "";
+                }, 
+                error: function(data, textStatus, xhr) {
+                    alert("Coupon is invalid");
+                }
+            });
         });
     </script>
 
