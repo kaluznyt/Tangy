@@ -279,7 +279,7 @@ namespace Tangy.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ShoppingCarts");
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("Tangy.Models.SubCategory", b =>
