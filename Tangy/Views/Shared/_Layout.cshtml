@@ -33,7 +33,7 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <li class="nav-item">
-                        <a href="#" class="nav-link">Order History</a>
+                        <a asp-controller="Order" asp-action="OrderHistory" class="nav-link">Order History</a>
                     </li>
                 }
 
@@ -58,7 +58,7 @@
                             Order
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Manage Order</a>
+                            <a asp-controller="Order" asp-action="ManageOrder" class="dropdown-item">Manage Order</a>
                             <a class="dropdown-item" href="#">Order Pickup</a>
                             <a class="dropdown-item" href="#">Download Order Details</a>
                         </div>
