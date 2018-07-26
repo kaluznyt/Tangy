@@ -1,0 +1,39 @@
+﻿@model Tangy.Models.ViewModels.DownloadOrderDetailsViewModel
+@{
+    ViewData["Title"] = "DownloadOrderDetails";
+}
+<br />
+<h2>Download Order Details</h2>
+<br />
+<form method="post">
+    <h4>Select Date Range</h4>
+    <br />
+    <div class="container row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-3 form-control">
+                    <label asp-for="FromDate"></label>
+                </div>
+                <div class="col-9 form-control">
+                    <input asp-for="FromDate" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 form-control">
+                    <label asp-for="ToDate"></label>
+                </div>
+                <div class="col-9 form-control">
+                    <input asp-for="ToDate" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 form-control">
+                    <button class="btn btn-success" type="submit">Download</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <br />
+    
+</form>

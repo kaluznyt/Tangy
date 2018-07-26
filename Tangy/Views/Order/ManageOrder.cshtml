@@ -1,0 +1,49 @@
+﻿@using Tangy.Utility
+@model List<Tangy.Models.ViewModels.OrderDetailsViewModel>
+
+@{
+    ViewData["Title"] = "ManageOrder";
+}
+
+<h2>Manage Order's</h2>
+<form method="post">
+    <br />
+    @if (Model.Any())
+    {
+        foreach (var orderDetailsViewModel in Model)
+        {
+            <div class="container row">
+                <div class="col-10">
+                    <partial name="_IndividualOrderDetails" model="@orderDetailsViewModel" />
+                </div>
+                <div class="col-2">
+                    @if (orderDetailsViewModel.OrderHeader.Status.Equals(StaticDetails.OrderStatus.Submitted))
+                    {
+                        <button type="submit" asp-action="OrderPrepare" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-primary form-control">
+                            <i class="fas fa-check"></i>Start Cooking
+                        </button>
+
+                        <button type="submit" asp-action="OrderCancel" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-danger form-control">
+                            <i class="fas fa-times"></i>Cancel
+                        </button>
+                    }
+                    else if (orderDetailsViewModel.OrderHeader.Status.Equals(StaticDetails.OrderStatus.InProcess))
+                    {
+                        <button type="submit" asp-action="OrderReady" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-success form-control">
+                            <i class="fas fa-flag-checkered"></i>Order Prepared
+                        </button>
+
+                        <button type="submit" asp-action="OrderCancel" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-danger form-control">
+                            <i class="fas fa-times"></i>Cancel
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p>No orders currently available</p>
+    }
+</form>
+
