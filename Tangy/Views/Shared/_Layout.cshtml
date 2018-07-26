@@ -13,7 +13,7 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.11.12/jquery.timepicker.css"/>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timepicker@1.11.12/jquery.timepicker.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/4.0.0/css/bootstrap.min.css"
@@ -59,7 +59,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a asp-controller="Order" asp-action="ManageOrder" class="dropdown-item">Manage Order</a>
-                            <a class="dropdown-item" href="#">Order Pickup</a>
+                            <a asp-controller="Order" asp-action="OrderPickup" class="dropdown-item">Order Pickup</a>
                             <a class="dropdown-item" href="#">Download Order Details</a>
                         </div>
                     </li>

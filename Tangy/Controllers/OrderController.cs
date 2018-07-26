@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Tangy.Areas.Identity.Data;
 using Tangy.Data;
 using Tangy.Models;
 using Tangy.Models.ViewModels;
@@ -67,8 +68,15 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> ManageOrder()
         {
+            var orderDetailsViewModel = await OrderDetailsViewModels(o => o.Status == StaticDetails.OrderStatus.Submitted || o.Status == StaticDetails.OrderStatus.InProcess);
+
+            return View(orderDetailsViewModel);
+        }
+
+        private async Task<List<OrderDetailsViewModel>> OrderDetailsViewModels(Func<OrderHeader, bool> orderFilter)
+        {
             var orderHeaders = await _db.OrderHeader
-                .Where(o => o.Status == StaticDetails.OrderStatus.Submitted || o.Status == StaticDetails.OrderStatus.InProcess)
+                .Where(o => orderFilter(o))
                 .OrderByDescending(u => u.PickupTime).ToListAsync();
 
             var orderDetailsViewModels = new List<OrderDetailsViewModel>();
@@ -85,9 +93,64 @@ namespace Tangy.Controllers
                 orderDetailsViewModels.Add(orderDetailsViewModel);
             }
 
-            return View(orderDetailsViewModels);
+            return orderDetailsViewModels;
         }
 
 
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> OrderPrepare(int orderId)
+        {
+            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.InProcess);
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> OrderCancel(int orderId)
+        {
+            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Cancelled);
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> OrderReady(int orderId)
+        {
+            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Ready);
+
+            return RedirectToAction("ManageOrder", "Order");
+        }
+
+        private async Task ChangeOrderStatus(int orderId, string status)
+        {
+            var order = await _db.OrderHeader.FindAsync(orderId);
+            order.Status = status;
+
+            await _db.SaveChangesAsync();
+        }
+
+
+        public async Task<IActionResult> OrderPickup(string searchOrder = null, string searchPhone = null, string searchEmail = null)
+        {
+            TangyUser user;
+
+            Func<OrderHeader, bool> searchQuery = null;
+
+            if (!string.IsNullOrWhiteSpace(searchPhone) || !string.IsNullOrWhiteSpace(searchEmail) || !string.IsNullOrWhiteSpace(searchOrder))
+            {
+                user = _db.ApplicationUsers.FirstOrDefault(u =>
+                    (!string.IsNullOrWhiteSpace(searchEmail) && (string.Equals(u.Email, searchEmail, StringComparison.InvariantCultureIgnoreCase))) &&
+                    (!string.IsNullOrWhiteSpace(searchPhone) && (string.Equals(u.PhoneNumber, searchPhone, StringComparison.InvariantCultureIgnoreCase))));
+
+                searchQuery = o => (string.IsNullOrWhiteSpace(searchOrder) || (o.Id.ToString() == searchOrder)) &&
+                                   (user == null || (user != null && o.UserId == user.Id));
+            }
+
+            searchQuery = searchQuery ?? (o => o.Status == StaticDetails.OrderStatus.Ready);
+
+            var orderPickupViewModel = await OrderDetailsViewModels(searchQuery);
+
+            return View(orderPickupViewModel);
+        }
     }
 }

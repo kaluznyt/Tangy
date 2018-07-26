@@ -29,8 +29,8 @@
                     }
                     else if (orderDetailsViewModel.OrderHeader.Status.Equals(StaticDetails.OrderStatus.InProcess))
                     {
-                        <button type="submit" asp-action="OrderReady" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-primary form-control">
-                            <i class="fas fa-flag-checked"></i>Order Prepared
+                        <button type="submit" asp-action="OrderReady" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-success form-control">
+                            <i class="fas fa-flag-checkered"></i>Order Prepared
                         </button>
 
                         <button type="submit" asp-action="OrderCancel" asp-route-orderId="@orderDetailsViewModel.OrderHeader.Id" class="btn btn-danger form-control">
