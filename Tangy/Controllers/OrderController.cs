@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +47,8 @@ namespace Tangy.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var orderHeaders = await _db.OrderHeader.Where(u => u.UserId == userId).OrderByDescending(u => u.OrderDate).ToListAsync();
+            var orderHeaders = await _db.OrderHeader.Where(u => u.UserId == userId).OrderByDescending(u => u.OrderDate)
+                .ToListAsync();
 
             var orderDetailsViewModels = new List<OrderDetailsViewModel>();
 
@@ -55,7 +58,7 @@ namespace Tangy.Controllers
                 {
                     OrderHeader = orderHeader,
                     OrderDetails = await _db.OrderDetails
-                            .Where(o => o.OrderId == orderHeader.Id).ToListAsync()
+                        .Where(o => o.OrderId == orderHeader.Id).ToListAsync()
                 };
 
                 orderDetailsViewModels.Add(orderDetailsViewModel);
@@ -68,7 +71,8 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> ManageOrder()
         {
-            var orderDetailsViewModel = await OrderDetailsViewModels(o => o.Status == StaticDetails.OrderStatus.Submitted || o.Status == StaticDetails.OrderStatus.InProcess);
+            var orderDetailsViewModel = await OrderDetailsViewModels(o =>
+                o.Status == StaticDetails.OrderStatus.Submitted || o.Status == StaticDetails.OrderStatus.InProcess);
 
             return View(orderDetailsViewModel);
         }
@@ -77,7 +81,8 @@ namespace Tangy.Controllers
         {
             var orderHeaders = await _db.OrderHeader
                 .Where(o => orderFilter(o))
-                .OrderByDescending(u => u.PickupTime).ToListAsync();
+                .OrderByDescending(u => u.PickupTime)
+                .ToListAsync();
 
             var orderDetailsViewModels = new List<OrderDetailsViewModel>();
 
@@ -130,17 +135,21 @@ namespace Tangy.Controllers
         }
 
 
-        public async Task<IActionResult> OrderPickup(string searchOrder = null, string searchPhone = null, string searchEmail = null)
+        public async Task<IActionResult> OrderPickup(string searchOrder = null, string searchPhone = null,
+            string searchEmail = null)
         {
             TangyUser user;
 
             Func<OrderHeader, bool> searchQuery = null;
 
-            if (!string.IsNullOrWhiteSpace(searchPhone) || !string.IsNullOrWhiteSpace(searchEmail) || !string.IsNullOrWhiteSpace(searchOrder))
+            if (!string.IsNullOrWhiteSpace(searchPhone) || !string.IsNullOrWhiteSpace(searchEmail) ||
+                !string.IsNullOrWhiteSpace(searchOrder))
             {
                 user = _db.ApplicationUsers.FirstOrDefault(u =>
-                    (!string.IsNullOrWhiteSpace(searchEmail) && (string.Equals(u.Email, searchEmail, StringComparison.InvariantCultureIgnoreCase))) &&
-                    (!string.IsNullOrWhiteSpace(searchPhone) && (string.Equals(u.PhoneNumber, searchPhone, StringComparison.InvariantCultureIgnoreCase))));
+                    (!string.IsNullOrWhiteSpace(searchEmail) && (string.Equals(u.Email, searchEmail,
+                         StringComparison.InvariantCultureIgnoreCase))) &&
+                    (!string.IsNullOrWhiteSpace(searchPhone) && (string.Equals(u.PhoneNumber, searchPhone,
+                         StringComparison.InvariantCultureIgnoreCase))));
 
                 searchQuery = o => (string.IsNullOrWhiteSpace(searchOrder) || (o.Id.ToString() == searchOrder)) &&
                                    (user == null || (user != null && o.UserId == user.Id));
@@ -151,6 +160,58 @@ namespace Tangy.Controllers
             var orderPickupViewModel = await OrderDetailsViewModels(searchQuery);
 
             return View(orderPickupViewModel);
+        }
+
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> OrderPickupDetails(int orderId)
+        {
+            var orderDetailsViewModels = await OrderDetailsViewModels(o => o.Id == orderId);
+            var orderDetailsViewModel = orderDetailsViewModels.FirstOrDefault();
+
+            if (orderDetailsViewModel != null)
+            {
+                orderDetailsViewModel.OrderHeader.ApplicationUser =
+                    _db.ApplicationUsers.Find(orderDetailsViewModel.OrderHeader.UserId);
+
+                return View(orderDetailsViewModel);
+            }
+
+            return View(null);
+        }
+
+        [HttpPost]
+        [ActionName("OrderPickupDetails")]
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> OrderPickupDetailsPost(int orderId)
+        {
+            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Completed);
+
+            return RedirectToAction("OrderPickup", "Order");
+        }
+
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+        public async Task<IActionResult> DownloadOrderDetails()
+        {
+            var downloadOrderDetailsVM = new DownloadOrderDetailsViewModel();
+            downloadOrderDetailsVM.FromDate = DateTime.Today.AddDays(-7);
+            downloadOrderDetailsVM.ToDate = DateTime.Today.AddDays(1).AddMinutes(-1);
+
+            return View(downloadOrderDetailsVM);
+        }
+
+        [HttpPost]
+        [ActionName(nameof(DownloadOrderDetails))]
+        [Authorize(Roles = StaticDetails.AdminEndUser)]
+
+        public async Task<IActionResult> DownloadOrderDetailsPost(DownloadOrderDetailsViewModel downloadOrderDetailsVM)
+        {
+            var orders = await _db.OrderHeader.Where(o => o.OrderDate >= downloadOrderDetailsVM.FromDate
+                                                        && o.OrderDate <= downloadOrderDetailsVM.ToDate)
+                                .ToListAsync();
+
+            var csv = string.Join(Environment.NewLine, orders.Select(o => $"\"{o.Id}\",\"{o.OrderDate}\",\"{o.OrderTotal}\",\"{o.Status}\"").ToList());
+
+            return File(Encoding.ASCII.GetBytes(csv), "text/csv", "OrderDetails.csv");
         }
     }
 }

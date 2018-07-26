@@ -60,7 +60,7 @@
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a asp-controller="Order" asp-action="ManageOrder" class="dropdown-item">Manage Order</a>
                             <a asp-controller="Order" asp-action="OrderPickup" class="dropdown-item">Order Pickup</a>
-                            <a class="dropdown-item" href="#">Download Order Details</a>
+                            <a asp-controller="Order" asp-action="DownloadOrderDetails"  class="dropdown-item">Download Order Details</a>
                         </div>
                     </li>
                 }
