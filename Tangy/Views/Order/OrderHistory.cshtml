@@ -1,4 +1,4 @@
-﻿@model List<Tangy.Models.ViewModels.OrderDetailsViewModel>
+﻿@model Tangy.Models.ViewModels.OrderListViewModel
 
 @{
     ViewData["Title"] = "OrderHistory";
@@ -9,9 +9,9 @@
 <br />
 
 
-@if (Model.Any())
+@if (Model.Orders.Any())
 {
-    foreach(var item in Model)
+    foreach (var item in Model.Orders)
     {
         <partial name="_IndividualOrderDetails" model="@item" />
     }
@@ -21,4 +21,8 @@ else
     <p>No past orders available.</p>
 }
 
-    <br />
+<br />
+
+<div page-model="@Model.PagingInfo" page-action="OrderHistory" page-classes-enabled="true"
+     page-class="btn border" page-class-normal="btn btn-defualt active" 
+     page-class-selected="btn btn-primary active" class="btn-group m-1"></div>

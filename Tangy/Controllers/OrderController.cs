@@ -18,6 +18,8 @@ namespace Tangy.Controllers
 {
     public class OrderController : Controller
     {
+        const int PageSize = 2;
+
         private readonly ApplicationDbContext _db;
 
         public OrderController(ApplicationDbContext db)
@@ -43,12 +45,15 @@ namespace Tangy.Controllers
 
 
         [Authorize]
-        public async Task<IActionResult> OrderHistory()
+        public async Task<IActionResult> OrderHistory(int productPage = 1)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var orderHeaders = await _db.OrderHeader.Where(u => u.UserId == userId).OrderByDescending(u => u.OrderDate)
-                .ToListAsync();
+            var orderHeaders = await _db.OrderHeader.Where(u => u.UserId == userId)
+                                        .OrderByDescending(u => u.OrderDate)
+                                        .Skip((productPage - 1) * PageSize)
+                                        .Take(PageSize)
+                                        .ToListAsync();
 
             var orderDetailsViewModels = new List<OrderDetailsViewModel>();
 
@@ -64,7 +69,19 @@ namespace Tangy.Controllers
                 orderDetailsViewModels.Add(orderDetailsViewModel);
             }
 
-            return View(orderDetailsViewModels);
+            var orderListViewModel = new OrderListViewModel
+            {
+                Orders = orderDetailsViewModels,
+                PagingInfo = new PagingInfo
+                {
+                    CurrentPage = productPage, 
+                    ItemsPerPage = PageSize,
+                    TotalItems = await _db.OrderHeader.CountAsync(u => u.UserId == userId)
+                }
+              
+            };
+
+            return View(orderListViewModel);
         }
 
 
