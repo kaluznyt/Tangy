@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Tangy.Areas.Identity.Data;
 using Tangy.Data;
+using Tangy.Extensions;
 using Tangy.Models;
 using Tangy.Models.ViewModels;
 using Tangy.Utility;
@@ -21,10 +23,12 @@ namespace Tangy.Controllers
         const int PageSize = 2;
 
         private readonly ApplicationDbContext _db;
+        private readonly IEmailSender _emailSender;
 
-        public OrderController(ApplicationDbContext db)
+        public OrderController(ApplicationDbContext db, IEmailSender emailSender)
         {
             _db = db;
+            _emailSender = emailSender;
         }
 
         [Authorize]
@@ -39,6 +43,9 @@ namespace Tangy.Controllers
                 OrderDetails = await _db.OrderDetails.Where(o => o.OrderId == id).ToListAsync()
             };
 
+            var customer = await _db.Users.FindAsync(orderDetailsViewModel.OrderHeader.UserId);
+
+            await SendChangeOrderStatusNotification(orderDetailsViewModel.OrderHeader.Id, customer, StaticDetails.OrderStatus.Submitted);
 
             return View(orderDetailsViewModel);
         }
@@ -74,11 +81,11 @@ namespace Tangy.Controllers
                 Orders = orderDetailsViewModels,
                 PagingInfo = new PagingInfo
                 {
-                    CurrentPage = productPage, 
+                    CurrentPage = productPage,
                     ItemsPerPage = PageSize,
                     TotalItems = await _db.OrderHeader.CountAsync(u => u.UserId == userId)
                 }
-              
+
             };
 
             return View(orderListViewModel);
@@ -122,7 +129,11 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> OrderPrepare(int orderId)
         {
-            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.InProcess);
+            var order = await ChangeOrderStatusAndSaveChanges(orderId, StaticDetails.OrderStatus.InProcess);
+
+            var customer = await _db.Users.FindAsync(order.UserId);
+
+            await SendChangeOrderStatusNotification(orderId, customer, StaticDetails.OrderStatus.InProcess);
 
             return RedirectToAction("ManageOrder", "Order");
         }
@@ -130,7 +141,11 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> OrderCancel(int orderId)
         {
-            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Cancelled);
+            var order = await ChangeOrderStatusAndSaveChanges(orderId, StaticDetails.OrderStatus.Cancelled);
+
+            var customer = await _db.Users.FindAsync(order.UserId);
+
+            await SendChangeOrderStatusNotification(orderId, customer, StaticDetails.OrderStatus.Cancelled);
 
             return RedirectToAction("ManageOrder", "Order");
         }
@@ -138,19 +153,29 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> OrderReady(int orderId)
         {
-            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Ready);
+            var order = await ChangeOrderStatusAndSaveChanges(orderId, StaticDetails.OrderStatus.Ready);
+
+            var customer = await _db.Users.FindAsync(order.UserId);
+
+            await SendChangeOrderStatusNotification(orderId, customer, StaticDetails.OrderStatus.Ready);
 
             return RedirectToAction("ManageOrder", "Order");
         }
 
-        private async Task ChangeOrderStatus(int orderId, string status)
+        private async Task SendChangeOrderStatusNotification(int orderId, IdentityUser customer, string orderStatus)
+        {
+            await _emailSender.SendOrderStatusAsync(customer.Email, $"{orderId}", orderStatus);
+        }
+
+        private async Task<OrderHeader> ChangeOrderStatusAndSaveChanges(int orderId, string status)
         {
             var order = await _db.OrderHeader.FindAsync(orderId);
             order.Status = status;
 
             await _db.SaveChangesAsync();
-        }
 
+            return order;
+        }
 
         public async Task<IActionResult> OrderPickup(string searchOrder = null, string searchPhone = null,
             string searchEmail = null)
@@ -201,7 +226,7 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> OrderPickupDetailsPost(int orderId)
         {
-            await ChangeOrderStatus(orderId, StaticDetails.OrderStatus.Completed);
+            await ChangeOrderStatusAndSaveChanges(orderId, StaticDetails.OrderStatus.Completed);
 
             return RedirectToAction("OrderPickup", "Order");
         }
@@ -209,11 +234,14 @@ namespace Tangy.Controllers
         [Authorize(Roles = StaticDetails.AdminEndUser)]
         public async Task<IActionResult> DownloadOrderDetails()
         {
-            var downloadOrderDetailsVM = new DownloadOrderDetailsViewModel();
-            downloadOrderDetailsVM.FromDate = DateTime.Today.AddDays(-7);
-            downloadOrderDetailsVM.ToDate = DateTime.Today.AddDays(1).AddMinutes(-1);
+            var downloadOrderDetailsViewModel =
+                new DownloadOrderDetailsViewModel
+                {
+                    FromDate = DateTime.Today.AddDays(-7),
+                    ToDate = DateTime.Today.AddDays(1).AddMinutes(-1)
+                };
 
-            return View(downloadOrderDetailsVM);
+            return View(downloadOrderDetailsViewModel);
         }
 
         [HttpPost]
