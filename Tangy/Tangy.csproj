@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
+    <Folder Include="wwwroot\lib\qrcodejs\" />
     <Folder Include="wwwroot\vendor\" />
   </ItemGroup>
 
