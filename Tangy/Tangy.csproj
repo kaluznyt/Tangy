@@ -7,14 +7,20 @@
 
   <ItemGroup>
     <Compile Remove="Areas\Identity\Services\**" />
+    <Compile Remove="Pages\**" />
     <Content Remove="Areas\Identity\Services\**" />
+    <Content Remove="Pages\**" />
     <EmbeddedResource Remove="Areas\Identity\Services\**" />
+    <EmbeddedResource Remove="Pages\**" />
     <None Remove="Areas\Identity\Services\**" />
+    <None Remove="Pages\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Data\Migrations\20180706215006_X.cs" />
     <Compile Remove="Data\Migrations\20180706215006_X.Designer.cs" />
+    <Compile Remove="Data\Migrations\20180725204258_X.cs" />
+    <Compile Remove="Data\Migrations\20180725204258_X.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +30,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
-    <Folder Include="Pages\" />
     <Folder Include="wwwroot\vendor\" />
   </ItemGroup>
 

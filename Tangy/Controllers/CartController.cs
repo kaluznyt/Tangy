@@ -126,8 +126,7 @@ namespace Tangy.Controllers
             await _db.SaveChangesAsync();
             HttpContext.Session.SetInt32("CartCount", 0);
 
-            return RedirectToAction("Index","Home");
-
+            return RedirectToAction("Confirm", "Order", new { id = OrderDetailsViewModel.OrderHeader.Id });
         }
     }
 }
