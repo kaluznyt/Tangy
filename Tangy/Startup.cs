@@ -48,6 +48,16 @@ namespace Tangy
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
 
+            var facebookAuthConfiguration = this.Configuration.GetSection("Authentication:Facebook");
+
+            services.AddAuthentication().AddFacebook(fb =>
+            {
+                fb.AppId = facebookAuthConfiguration["AppId"];
+                fb.AppSecret = facebookAuthConfiguration["AppSecret"];
+                fb.Fields.Add("email");
+                fb.Fields.Add("first_name");
+            });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddDistributedMemoryCache();
@@ -58,6 +68,8 @@ namespace Tangy
             });
 
             services.AddTransient<IEmailSender, EmailSender>();
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
